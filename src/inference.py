@@ -1,8 +1,12 @@
+import sys
 import os
 import click
 import torch
 from PIL import Image, ImageDraw, ImageFile
 from torchvision.transforms import v2
+
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(parent_dir)
 
 from config import IMG_SIZE
 
@@ -91,38 +95,42 @@ def process_directory(directory_path: str) -> tuple[list[Image.Image], list[torc
             original_images.append(original_image)
             images_to_model.append(image_to_model)
 
-    return original_images, torch.stack(images_to_model)
+    return original_images, torch.cat(images_to_model, dim=0)
 
 
 @click.command()
-@click.option(
-    'input_path',
-    type=click.Path(exists=True),
-    help="Path to a file or directory for input data to model inference"
-)
-@click.option(
-    'model_save_path',
-    type=click.Path(exists=True),
-    help="The path to the file with a saved Model"
-)
-def main(**kwargs):
-    path_type = check_path(kwargs['input_path'])
-    model_save_path = kwargs['model_save_path']
+@click.option('--input-path', type=click.Path(exists=True), required=True, help="Path to a file or directory for input data to model inference")
+@click.option('--model_path', type=click.Path(exists=True), required=True, help="The path to the file with a saved Model")
+@click.option('--output_dir', type=str, default='output')
 
-    model = torch.load(model_save_path, map_location=torch.device('cuda:0'))
+def main(**kwargs):
+    input_path = kwargs['input_path']
+    path_type = check_path(kwargs['input_path'])
+    model_save_path = kwargs['model_path']
+    output_dir = kwargs['output_dir']
+
+    os.makedirs(output_dir, exist_ok=True)
+
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    model = torch.load(model_save_path, map_location=device, weights_only=False)
 
     if path_type == "file":
         original_image, image_to_model = process_image(kwargs['input_path'])
+        image_to_model = image_to_model.to(device)
         output = inference(model=model, input_data=image_to_model)
         predicted_class_index = torch.argmax(output,1).item()
         predicted_class_name = CLASS_NAMES[predicted_class_index]
 
         draw = ImageDraw.Draw(original_image)
         draw.text((10, 10), predicted_class_name, fill=(0, 0, 0))
-        original_image.show()
+
+        output_image_path = os.path.join(output_dir, os.path.basename(input_path))
+        original_image.save(output_image_path)
+        click.echo(f"Processed image saved to {output_image_path}")
 
     if path_type == "directory":
         original_images, images_to_model = process_directory(kwargs['input_path'])
+        images_to_model = images_to_model.to(device)
         output = inference(model=model, input_data=images_to_model)
         predicted_class_index = torch.argmax(output, 1).tolist()
         predicted_class_names = [CLASS_NAMES[idx] for idx in predicted_class_index]
@@ -132,7 +140,9 @@ def main(**kwargs):
             draw = ImageDraw.Draw(original_image)
             draw.text((10, 10), predicted_class_names[i], fill=(0, 0, 0))
 
-            original_image.show()
+            output_image_path = os.path.join(output_dir, os.path.basename(original_images[i].filename))
+            original_image.save(output_image_path)
+            click.echo(f"Processed image saved to {output_image_path}")
 
 
 if __name__ == '__main__':
