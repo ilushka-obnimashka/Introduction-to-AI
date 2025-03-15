@@ -53,16 +53,16 @@ def save_test_graphs(
 
     for (metricName, meric_vals) in metrics_per_class.items():
         plt.figure(figsize=(12, 6))
-        plt.bar(class_names, meric_vals)
+        plt.bar(class_names, meric_vals,
+                label=f"Среднее значение: {np.mean(meric_vals):.2f}")
         plt.title("Test_" + metricName + " per Class")
         plt.xlabel("Class")
         plt.ylabel(metricName)
         plt.xticks(rotation=90)
         plt.grid(axis="y")
-        plt.text(len(class_names) / 2, max(meric_vals) * 1.05,
-                 f"Среднее значение: {np.mean(meric_vals):.2f}",
-                 ha='center', fontsize=14,
-                 bbox=dict(facecolor='lightblue', alpha=0.5, edgecolor='black'))
+
+        plt.legend(loc='upper right', fontsize=12)
+
         plt.tight_layout()
         plt.savefig(os.path.join(save_dir, metricName + ".png"))
         plt.close()
