@@ -11,11 +11,11 @@ BATCH_SIZE = 64
 IMG_SIZE = (224, 224)
 
 MODEL_NAME = "resnet18"
-MODEL = models.resnet18()
+MODEL = models.resnet18(pretrained=False)
 MODEL.fc = nn.Linear(MODEL.fc.in_features, NUM_CLASSES)
 MODEL.to(DEVICE)
 
-NUM_EPOCHS = 30
+NUM_EPOCHS = 50
 LEARNING_RATE = 0.001
 
 OPTIMIZER = optim.Adam(MODEL.parameters(), lr=LEARNING_RATE)
@@ -24,10 +24,11 @@ CRITERION = nn.CrossEntropyLoss()
 
 def get_save_dir(model_name, optimizer, num_epochs, lr):
     """
-    Создает имя директории на основе параметров модели и обучения.
+    Создает имя директории на основе параметров модели, обучения и текущего времени (без года).
     """
     optimizer_name = optimizer.__class__.__name__
-    dir_name = f"{model_name}_{optimizer_name}_epochs{num_epochs}_lr{lr}"
+    current_time = datetime.now().strftime("%m%d_%H%M%S")
+    dir_name = f"{model_name}_{optimizer_name}_epochs{num_epochs}_lr{lr}_{current_time}"
     return dir_name
 
 

@@ -13,12 +13,15 @@ tuple[DataLoader, DataLoader, DataLoader, str]:
     Returns:
         train_loader, test_loader, val_loader, class_names
     """
+    
     transform = v2.Compose([
         v2.Resize(img_size),
         v2.RandomResizedCrop(size=img_size, scale=(0.8, 1.0)),
         v2.RandomHorizontalFlip(p=0.5),
-        v2.RandomApply([v2.RandomAffine(degrees=(-15, 15), translate=(0.1, 0.1),
-                                        scale=(0.9, 1.1))], p=0.3),
+        v2.RandomApply([v2.RandomAffine(degrees=(-45, 45), translate=(0.1, 0.1),
+                                        scale=(0.9, 1.1))], p=0.5),
+        v2.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
+        v2.RandomPerspective(distortion_scale=0.4, p=0.5), 
         v2.ToTensor(),
         v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])

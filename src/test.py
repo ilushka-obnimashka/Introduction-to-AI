@@ -9,7 +9,7 @@ from .graph_utils import save_test_graphs
 
 
 def test(
-        model: torch.nn.Module,
+        model_best_path: torch.nn.Module,
         device: torch.device,
         num_classes: int,
         class_names: list[str],
@@ -29,6 +29,9 @@ def test(
 
         confusion_matrix (np.ndarray): Матрица ошибок (confusion matrix).
     """
+
+    model = torch.load(model_best_path, map_location=device, weights_only=False)
+
     accuracy_metric = MulticlassAccuracy(num_classes=num_classes, average=None).to(device)
     precision_metric = MulticlassPrecision(num_classes=num_classes, average=None).to(device)
     recall_metric = MulticlassRecall(num_classes=num_classes, average=None).to(device)

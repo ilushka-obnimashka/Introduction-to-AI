@@ -12,7 +12,7 @@ def main():
     train(MODEL, DEVICE, OPTIMIZER, CRITERION, NUM_EPOCHS, train_loader,
           val_loader, MODEL_SAVE_PATH, GRAPHS_DIR)
 
-    test(MODEL, DEVICE, NUM_CLASSES, class_names, test_loader, GRAPHS_DIR)
+    test(MODEL_SAVE_PATH, DEVICE, NUM_CLASSES, class_names, test_loader, GRAPHS_DIR)
 
 
 if __name__ == '__main__':
