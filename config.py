@@ -1,7 +1,9 @@
+import os
+from datetime import datetime
+
 import torch
 from torch import optim, nn
 from torchvision import models
-import os
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -10,15 +12,16 @@ NUM_CLASSES = 42
 BATCH_SIZE = 64
 IMG_SIZE = (224, 224)
 
-MODEL_NAME = "resnet18"
-MODEL = models.resnet18(pretrained=False)
+MODEL_NAME = "resnet34"
+MODEL = models.resnet34(pretrained=False)
 MODEL.fc = nn.Linear(MODEL.fc.in_features, NUM_CLASSES)
 MODEL.to(DEVICE)
 
-NUM_EPOCHS = 50
-LEARNING_RATE = 0.001
+NUM_EPOCHS = 30
+LEARNING_RATE = 0.002
+WEIGHT_DECAY = 0.001
 
-OPTIMIZER = optim.Adam(MODEL.parameters(), lr=LEARNING_RATE)
+OPTIMIZER = optim.Adam(MODEL.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
 CRITERION = nn.CrossEntropyLoss()
 
 

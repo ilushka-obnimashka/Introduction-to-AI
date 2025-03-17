@@ -1,7 +1,7 @@
-from src.data_loader import load_data
-from src.train import train
-from src.test import test
 from config import *
+from src.data_loader import load_data
+from src.test import test
+from src.train import train
 
 
 def main():

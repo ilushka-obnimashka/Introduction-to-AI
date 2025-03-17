@@ -1,8 +1,9 @@
-import sys
 import os
+import sys
+
 import click
 import torch
-from PIL import Image, ImageDraw, ImageFile
+from PIL import Image, ImageDraw
 from torchvision.transforms import v2
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -99,10 +100,11 @@ def process_directory(directory_path: str) -> tuple[list[Image.Image], list[torc
 
 
 @click.command()
-@click.option('--input-path', type=click.Path(exists=True), required=True, help="Path to a file or directory for input data to model inference")
-@click.option('--model_path', type=click.Path(exists=True), required=True, help="The path to the file with a saved Model")
+@click.option('--input-path', type=click.Path(exists=True), required=True,
+              help="Path to a file or directory for input data to model inference")
+@click.option('--model_path', type=click.Path(exists=True), required=True,
+              help="The path to the file with a saved Model")
 @click.option('--output_dir', type=str, default='output')
-
 def main(**kwargs):
     input_path = kwargs['input_path']
     path_type = check_path(kwargs['input_path'])
@@ -118,7 +120,7 @@ def main(**kwargs):
         original_image, image_to_model = process_image(kwargs['input_path'])
         image_to_model = image_to_model.to(device)
         output = inference(model=model, input_data=image_to_model)
-        predicted_class_index = torch.argmax(output,1).item()
+        predicted_class_index = torch.argmax(output, 1).item()
         predicted_class_name = CLASS_NAMES[predicted_class_index]
 
         draw = ImageDraw.Draw(original_image)
@@ -136,7 +138,6 @@ def main(**kwargs):
         predicted_class_names = [CLASS_NAMES[idx] for idx in predicted_class_index]
 
         for i, original_image in enumerate(original_images):
-
             draw = ImageDraw.Draw(original_image)
             draw.text((10, 10), predicted_class_names[i], fill=(0, 0, 0))
 

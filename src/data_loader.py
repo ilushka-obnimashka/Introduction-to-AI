@@ -1,11 +1,11 @@
+from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, Subset
 from torchvision import datasets
 from torchvision.transforms import v2
-from sklearn.model_selection import train_test_split
 
 
 def load_data(img_size: tuple[int, int], data_dir: str, batch_size: int) -> \
-tuple[DataLoader, DataLoader, DataLoader, str]:
+        tuple[DataLoader, DataLoader, DataLoader, str]:
     """
     Загружает датасет, применяет аугментации "на лету", разделяет датасет на тренировочную, тестовую
     и валидационные части.
@@ -13,7 +13,7 @@ tuple[DataLoader, DataLoader, DataLoader, str]:
     Returns:
         train_loader, test_loader, val_loader, class_names
     """
-    
+
     transform = v2.Compose([
         v2.Resize(img_size),
         v2.RandomResizedCrop(size=img_size, scale=(0.8, 1.0)),
@@ -21,7 +21,7 @@ tuple[DataLoader, DataLoader, DataLoader, str]:
         v2.RandomApply([v2.RandomAffine(degrees=(-45, 45), translate=(0.1, 0.1),
                                         scale=(0.9, 1.1))], p=0.5),
         v2.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
-        v2.RandomPerspective(distortion_scale=0.4, p=0.5), 
+        v2.RandomPerspective(distortion_scale=0.4, p=0.5),
         v2.ToTensor(),
         v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])

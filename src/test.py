@@ -1,9 +1,9 @@
-from torchmetrics.classification import MulticlassPrecision, MulticlassRecall, MulticlassF1Score, MulticlassAccuracy
 import numpy as np
-from sklearn.metrics import confusion_matrix
-from tqdm import tqdm
 import torch
+from sklearn.metrics import confusion_matrix
 from torch.utils.data import DataLoader
+from torchmetrics.classification import MulticlassPrecision, MulticlassRecall, MulticlassF1Score, MulticlassAccuracy
+from tqdm import tqdm
 
 from .graph_utils import save_test_graphs
 
@@ -67,4 +67,3 @@ def test(
     save_test_graphs(accuracy, precision, recall, f1, model_confusion_matrix, save_dir, class_names)
 
     print("\033[91mTesting complete\033[0m")
-
