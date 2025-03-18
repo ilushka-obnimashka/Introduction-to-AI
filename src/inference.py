@@ -4,18 +4,13 @@ import sys
 import click
 import torch
 from PIL import Image, ImageDraw
-from torchvision.transforms import v2
+
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(parent_dir)
 
-from config import IMG_SIZE
+from config import IMG_SIZE, INFERENCE_TRANSFORM
 
-transform = v2.Compose([
-    v2.Resize(IMG_SIZE),
-    v2.ToTensor(),
-    v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-])
 
 CLASS_NAMES = ['abraham_grampa_simpson',
                'agnes_skinner',
@@ -82,7 +77,7 @@ def check_path(path):
 
 def process_image(image_path: str) -> tuple[Image.Image, torch.Tensor]:
     original_image = Image.open(image_path)
-    image = transform(original_image)
+    image = INFERENCE_TRANSFORM(original_image)
     image = image.unsqueeze(0)
     return original_image, image
 
