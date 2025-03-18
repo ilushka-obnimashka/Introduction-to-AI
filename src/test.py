@@ -20,7 +20,7 @@ def test(
     Тестирует модель на тестовом наборе данных и вычисляет метрики для каждого класса.
     Returns:
         precision (np.ndarray) - Массив precision для каждого класса.
-
+        mi
         recall (np.ndarray): Массив recall для каждого класса.
 
         f1 (np.ndarray): Массив F1-score для каждого класса.
@@ -36,6 +36,11 @@ def test(
     precision_metric = MulticlassPrecision(num_classes=num_classes, average=None).to(device)
     recall_metric = MulticlassRecall(num_classes=num_classes, average=None).to(device)
     f1_metric = MulticlassF1Score(num_classes=num_classes, average=None).to(device)
+
+    micro_accuracy_metric = MulticlassAccuracy(num_classes=num_classes, average="micro").to(device)
+    micro_precision_metric = MulticlassPrecision(num_classes=num_classes, average="micro").to(device)
+    micro_recall_metric = MulticlassRecall(num_classes=num_classes, average="micro").to(device)
+    micro_f1_metric = MulticlassF1Score(num_classes=num_classes, average="micro").to(device)
 
     model.eval()
 
@@ -54,6 +59,11 @@ def test(
             recall_metric.update(predicted, labels)
             f1_metric.update(predicted, labels)
 
+            micro_accuracy_metric.update(predicted, labels)
+            micro_precision_metric.update(predicted, labels)
+            micro_recall_metric.update(predicted, labels)
+            micro_f1_metric.update(predicted, labels)
+
             labels_true.extend(labels.cpu().numpy())
             labels_pred.extend(predicted.cpu().numpy())
 
@@ -62,8 +72,15 @@ def test(
     recall = recall_metric.compute().cpu().numpy()
     f1 = f1_metric.compute().cpu().numpy()
 
+    micro_accuracy = micro_accuracy_metric.compute().item()
+    micro_precision = micro_precision_metric.compute().item()
+    micro_recall = micro_recall_metric.compute().item()
+    micro_f1 = micro_f1_metric.compute().item()
+
     model_confusion_matrix = confusion_matrix(labels_true, labels_pred)
 
-    save_test_graphs(accuracy, precision, recall, f1, model_confusion_matrix, save_dir, class_names)
+    save_test_graphs(accuracy, micro_accuracy, precision, micro_precision, recall, micro_recall, f1, micro_f1, model_confusion_matrix, save_dir, class_names)
 
     print("\033[91mTesting complete\033[0m")
+
+    return accuracy, precision, recall, model_confusion_matrix
