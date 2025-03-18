@@ -7,7 +7,7 @@ from src.train import train
 def main():
     train_loader, test_loader, val_loader, class_names = load_data(IMG_SIZE,
                                                                    DATA_DIR,
-                                                                   BATCH_SIZE)
+                                                                   BATCH_SIZE, TRAIN_TRANSFORM, INFERENCE_TRANSFORM)
 
     train(MODEL, DEVICE, OPTIMIZER, CRITERION, NUM_EPOCHS, train_loader,
           val_loader, MODEL_SAVE_PATH, GRAPHS_DIR)
