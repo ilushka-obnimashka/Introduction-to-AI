@@ -37,25 +37,31 @@ def save_train_val_graphs(train_losses, val_losses, train_accuracies,
 
 def save_test_graphs(
         accuracy: np.ndarray[np.float64],
+        micro_accuracy: np.float64,
         precision: np.ndarray[np.float64],
+        micro_precision: np.float64,
         recall: np.ndarray[np.float64],
+        micro_recall: np.float64,
         f1: np.ndarray[np.float64],
+        micro_f1: np.float64,
         confusion_matrix: np.ndarray[np.float64],
         save_dir: str,
         class_names: list[str]
 ) -> None:
     os.makedirs(save_dir, exist_ok=True)
 
-    metrics_per_class = {"Accuracy": accuracy,
-                         "Recall": recall,
-                         "Precision": precision,
-                         "F1": f1}
+    metrics_per_class = {"Accuracy": (accuracy, micro_accuracy),
+                         "Recall": (recall, micro_recall),
+                         "Precision": (precision, micro_precision),
+                         "F1": (f1, micro_f1)}
     plt.style.use("ggplot")
 
-    for (metricName, meric_vals) in metrics_per_class.items():
+    for (metricName, metric_vals) in metrics_per_class.items():
+        metric_per_class, micro_metric = metric_vals
+
         plt.figure(figsize=(12, 6))
-        plt.bar(class_names, meric_vals,
-                label=f"Среднее значение: {np.mean(meric_vals):.2f}")
+        plt.bar(class_names, metric_per_class,
+                label=f"micro: {np.mean(micro_metric):.2f}")
         plt.title("Test_" + metricName + " per Class")
         plt.xlabel("Class")
         plt.ylabel(metricName)
