@@ -3,7 +3,7 @@ from torch.utils.data import DataLoader, Subset
 from torchvision import datasets
 
 
-def load_data(img_size: tuple[int, int], data_dir: str, batch_size: int, train_transform, val_transform) -> \
+def load_data(data_dir_train: str, data_dir_test: str,batch_size: int, train_transform, val_transform) -> \
         tuple[DataLoader, DataLoader, DataLoader, str]:
     """
     Загружает датасет, применяет аугментации "на лету", разделяет датасет на тренировочную, тестовую
@@ -15,9 +15,9 @@ def load_data(img_size: tuple[int, int], data_dir: str, batch_size: int, train_t
 
     test_transform = val_transform
 
-    dataset = datasets.ImageFolder(root=data_dir, transform=train_transform)
-    val_dataset = datasets.ImageFolder(root=data_dir, transform=val_transform)
-    test_dataset = datasets.ImageFolder(root=data_dir, transform=test_transform)
+    dataset = datasets.ImageFolder(root=data_dir_train, transform=train_transform)
+    val_dataset = datasets.ImageFolder(root=data_dir_train, transform=val_transform)
+    test_dataset = datasets.ImageFolder(root=data_dir_test, transform=test_transform)
 
     class_names = sorted(dataset.classes)
     class_to_idx = {class_name: i for i, class_name in enumerate(class_names)}
@@ -41,6 +41,6 @@ def load_data(img_size: tuple[int, int], data_dir: str, batch_size: int, train_t
                             shuffle=False)
 
     test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size,
-                            shuffle=False)
+                             shuffle=False)
 
     return train_loader, test_loader, val_loader, class_names

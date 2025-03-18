@@ -4,6 +4,7 @@ from datetime import datetime
 import torch
 from torch import optim, nn
 from torchvision import models
+from torchvision.transforms import v2
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -12,7 +13,7 @@ NUM_CLASSES = 42
 BATCH_SIZE = 64
 IMG_SIZE = (224, 224)
 
-MODEL_NAME = "resnet34"
+MODEL_NAME = "1resnet34"
 MODEL = models.resnet34(pretrained=False)
 MODEL.fc = nn.Linear(MODEL.fc.in_features, NUM_CLASSES)
 MODEL.to(DEVICE)
@@ -21,7 +22,7 @@ NUM_EPOCHS = 30
 LEARNING_RATE = 0.002
 WEIGHT_DECAY = 0.001
 
-OPTIMIZER = optim.Adam(MODEL.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
+OPTIMIZER = optim.Adam(MODEL.parameters(), lr=LEARNING_RATE)
 CRITERION = nn.CrossEntropyLoss()
 
 
@@ -42,3 +43,21 @@ os.makedirs(SAVE_DIR, exist_ok=True)
 
 MODEL_SAVE_PATH = os.path.join(SAVE_DIR, "best_model.pth")
 GRAPHS_DIR = os.path.join(SAVE_DIR, "graphs")
+
+INFERENCE_TRANSFORM = transform = v2.Compose([
+    v2.Resize(IMG_SIZE),
+    v2.ToTensor(),
+    v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
+
+TRAIN_TRANSFORM = v2.Compose([
+        v2.Resize(IMG_SIZE),
+        v2.RandomResizedCrop(size=IMG_SIZE, scale=(0.8, 1.0)),
+        v2.RandomHorizontalFlip(p=0.5),
+        v2.RandomApply([v2.RandomAffine(degrees=(-45, 45), translate=(0.1, 0.1),
+                                        scale=(0.9, 1.1))], p=0.5),
+        v2.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
+        v2.RandomPerspective(distortion_scale=0.4, p=0.5),
+        v2.ToTensor(),
+        v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
