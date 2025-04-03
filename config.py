@@ -6,20 +6,22 @@ from torch import optim, nn
 from torchvision import models
 from torchvision.transforms import v2
 
-DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+DEVICE = torch.device("cuda:3" if torch.cuda.is_available() else "cpu")
 
 DATA_DIR = "my_simpsons"
 NUM_CLASSES = 42
-BATCH_SIZE = 64
+BATCH_SIZE = 128
 IMG_SIZE = (224, 224)
 
-MODEL_NAME = "1resnet34"
-MODEL = models.resnet34(pretrained=False)
-MODEL.fc = nn.Linear(MODEL.fc.in_features, NUM_CLASSES)
+MODEL_NAME = "MobileNetV2"
+MODEL = models.mobilenet_v2(pretrained=False)
+MODEL.classifier[1] = nn.Linear(1280, NUM_CLASSES)
+#MODEL.classifier[6] = nn.Linear(4096, NUM_CLASSES)
+#MODEL.fc = nn.Linear(MODEL.fc.in_features, NUM_CLASSES)
 MODEL.to(DEVICE)
 
 NUM_EPOCHS = 30
-LEARNING_RATE = 0.002
+LEARNING_RATE = 0.005
 WEIGHT_DECAY = 0.001
 
 OPTIMIZER = optim.Adam(MODEL.parameters(), lr=LEARNING_RATE)

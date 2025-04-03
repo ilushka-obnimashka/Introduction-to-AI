@@ -70,7 +70,7 @@ def save_class_distributio(class_counts: dict[str, int], dataset_path: str) -> N
 
 
 def main() -> None:
-    dataset_path = "../my_simpsons"
+    dataset_path = "../orig"
 
     class_count = analyze_class_distribution(dataset_path)
     plot_class_distribution(class_count, dataset_path)

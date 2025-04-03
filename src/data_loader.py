@@ -29,18 +29,18 @@ def load_data(data_dir: str, batch_size: int, train_transform, val_transform) ->
     labels = [dataset.targets[i] for i in range(len(dataset))]
 
     train_idx, val_test_idx = train_test_split(range(len(dataset)), test_size=0.3, stratify=labels)
-    val_idx, test_idx = train_test_split(val_test_idx, test_size=0.5, stratify=[labels[i] for i in val_test_idx])
+    val_idx, test_idx = train_test_split(val_test_idx, test_size=0.6, stratify=[labels[i] for i in val_test_idx])
 
     train_dataset = Subset(dataset, train_idx)
     val_dataset = Subset(val_dataset, val_idx)
     test_dataset = Subset(test_dataset, test_idx)
 
     train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size,
-                              shuffle=True)
+                              shuffle=True, num_workers=16)
     val_loader = DataLoader(dataset=val_dataset, batch_size=batch_size,
-                            shuffle=False)
+                            shuffle=False, num_workers=16)
 
     test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size,
-                             shuffle=False)
+                             shuffle=False, num_workers=16)
 
     return train_loader, test_loader, val_loader, class_names
